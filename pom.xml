@@ -298,12 +298,12 @@
       <repository>
         <id>nexus</id>
         <name>Nexus Release Repository</name>
-        <url>http://13.127.224.210:8081/repository/petclinic-release-repo/</url>
+        <url>http://13.233.155.52:8081/repository/petclinic-release-repo/</url>
      </repository>
      <snapshotRepository>
         <id>nexus</id>
         <name>Nexus Snapshot Repository</name>
-        <url>http://15.206.165.111:8081/repository/petclinic-snapshot/</url>
+        <url>http://13.233.155.52:8081/repository/petclinic-snapshot/</url>
      </snapshotRepository>
    </distributionManagement>
     <!-- Maven plugin versions are mentioned in order to guarantee the build reproducibility in the long term -->
