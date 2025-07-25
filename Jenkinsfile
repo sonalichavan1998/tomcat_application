@@ -2,45 +2,66 @@ pipeline {
     agent any
 
     tools {
-        maven 'maven 3.9.9'  // Must match name in Jenkins → Global Tool Configuration
-    }
- options {
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '4', numToKeepStr: '3')
-  timestamps()
-}
-
-    environment {
-        SONARQUBE_ENV = 'sonar'  // Must match name in Jenkins → Manage Jenkins → Configure System → SonarQube
+        maven 'maven 3.9.10' // Ensure this is configured under Jenkins Global Tool Configuration
     }
 
     stages {
-        stage('Cloning Repo') {
+
+        stage('Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/sanket0101/tomcat_application.git'
+                git branch: 'main', url: 'https://github.com/sonalichavan1998/tomcat_application.git'
             }
         }
 
-        stage('Build') {
+        stage('Maven Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Sonar Analysis') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh 'mvn sonar:sonar'
+                sh 'mvn sonar:sonar'
+            }
+        }
+
+        stage('Nexus Upload') {
+            steps {
+                sh 'mvn deploy'
+            }
+        }
+
+        stage('Tomcat Hosting') {
+            steps {
+                sshagent(['tomcat']) {
+                    sh """
+                        scp -o StrictHostKeyChecking=no target/petclinic.war ubuntu@13.203.213.94:/opt/apache-tomcat-9.0.106/webapps/
+                    """
                 }
             }
         }
-    }
 
-    post {
-        success {
-            echo '✅ Pipeline completed successfully!'
-        }
-        failure {
-            echo '❌ Pipeline failed. Check logs.'
-        }
-    }
-}
+    } // end stages
+ post {
+          success {
+              slackSend (
+                  color: 'good', // green
+                  message: "✅ Build Success - Job: ${env.JOB_NAME}, Build: #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|Click here to view details>"
+              )
+          }
+          failure {
+              slackSend (
+                  color: 'danger', // red
+                  message: "❌ Build Failed - Job: ${env.JOB_NAME}, Build: #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|Click here to view details>"
+              )
+          }
+          unstable {
+              slackSend (
+                  color: 'warning', // yellow
+                  message: "⚠️ Build Unstable - Job: ${env.JOB_NAME}, Build: #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|Click here to view details>"
+              )
+          }
+      }	  
+  
+  
+} // end pipeline
