@@ -80,8 +80,8 @@
         <docker.jib-maven-plugin.version>2.6.0</docker.jib-maven-plugin.version>
         <docker.image.prefix>springcommunity</docker.image.prefix>
         
-        <sonar.host.url>http://3.110.185.130:9000/</sonar.host.url>
-        <sonar.token>squ_6e808dd560d3c7fb06976c0734ba39709dd82443</sonar.token>
+        <sonar.host.url>http://13.232.250.150:9000/</sonar.host.url>
+        <sonar.token>squ_4cc64edf75d0db313db550faf0da5b2c6575e141</sonar.token>
        
     </properties>
 
